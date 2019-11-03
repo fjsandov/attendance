@@ -1,0 +1,55 @@
+# Ruby CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-ruby/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.6.0
+        environment:
+          PGHOST: localhost
+          RAILS_ENV: test
+      - image: postgres:9.6.3
+        environment:
+          POSTGRES_USER: attendance
+          POSTGRES_DB: attendance_test
+
+    working_directory: ~/attendance
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "Gemfile.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run:
+          name: Migrate database
+          command: bundle exec rake db:migrate
+
+      - run:
+          name: Run rspec in parallel
+          command: bundle exec rspec
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
