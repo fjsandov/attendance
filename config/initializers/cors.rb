@@ -5,12 +5,15 @@
 
 # Read more: https://github.com/cyu/rack-cors
 
-# Rails.application.config.middleware.insert_before 0, Rack::Cors do
-#   allow do
-#     origins 'example.com'
-#
-#     resource '*',
-#       headers: :any,
-#       methods: [:get, :post, :put, :patch, :delete, :options, :head]
-#   end
-# end
+# TODO: set a production client origin
+env_origins = Rails.env.production? ? 'TODO' : 'http://localhost:3001'
+
+Rails.application.config.middleware.insert_before 0, Rack::Cors do
+  allow do
+    origins env_origins
+    resource '*',
+      headers: %w(Authorization),
+      methods: :any,
+      expose: %w(Authorization)
+  end
+end
