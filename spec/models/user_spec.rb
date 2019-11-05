@@ -6,6 +6,10 @@ RSpec.describe User, type: :model do
 
   it { should be_valid }
 
+  describe 'associations' do
+    it { should have_many(:periods) }
+  end
+
   describe '#email' do
     describe 'basic validations' do
       it { should validate_presence_of(:email) }

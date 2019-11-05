@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  resources :users, only: :index do
+    resources :periods, except: :show
+  end
+
   devise_for :users,
              path: '',
              path_names: {

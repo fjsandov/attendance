@@ -1,15 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe SessionsController, type: :controller do
-  include Devise::Test::ControllerHelpers
-
   before do
     @request.env["devise.mapping"] = Devise.mappings[:user]
   end
 
   describe 'POST #create' do
     let(:user) { create(:user) }
-    let(:params) do
+    let(:valid_attributes) do
       {
         user: {
           email: user.email,
@@ -18,23 +16,32 @@ RSpec.describe SessionsController, type: :controller do
       }
     end
 
-    context 'when login params are incorrect' do
+    let(:invalid_attributes) do
+      {
+        user: {
+          email: user.email,
+          password: 'wrong-password'
+        }
+      }
+    end
+
+    context 'with invalid params' do
       before do
-        post :create
+        post :create, params: invalid_attributes
       end
 
-      it 'returns unauthorized status' do
-        expect(response.status).to eq 401
+      it 'returns an "unauthorized" status' do
+        expect(response).to have_http_status :unauthorized
       end
     end
 
-    context 'when params are correct' do
+    context 'with valid params' do
       before do
-        post :create, params: params
+        post :create, params: valid_attributes
       end
 
-      it 'returns ok status' do
-        expect(response).to have_http_status(200)
+      it 'returns with an ok status' do
+        expect(response).to have_http_status :ok
       end
 
       it 'returns a valid body' do
@@ -50,8 +57,8 @@ RSpec.describe SessionsController, type: :controller do
       delete :destroy
     end
 
-    it 'returns no content status' do
-      expect(response).to have_http_status(204)
+    it 'returns with a "no content" status' do
+      expect(response).to have_http_status :no_content
     end
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_30_204622) do
+ActiveRecord::Schema.define(version: 2019_11_04_182047) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,6 +19,25 @@ ActiveRecord::Schema.define(version: 2019_10_30_204622) do
     t.string "jti", null: false
     t.datetime "exp", null: false
     t.index ["jti"], name: "index_jwt_blacklist_on_jti"
+  end
+
+  create_table "period_deletions", force: :cascade do |t|
+    t.bigint "user_id"
+    t.text "reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_period_deletions_on_user_id"
+  end
+
+  create_table "periods", force: :cascade do |t|
+    t.bigint "user_id"
+    t.datetime "started_at"
+    t.datetime "ended_at"
+    t.bigint "period_deletion_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["period_deletion_id"], name: "index_periods_on_period_deletion_id"
+    t.index ["user_id"], name: "index_periods_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -35,4 +54,7 @@ ActiveRecord::Schema.define(version: 2019_10_30_204622) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "period_deletions", "users"
+  add_foreign_key "periods", "period_deletions"
+  add_foreign_key "periods", "users"
 end
