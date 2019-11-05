@@ -13,24 +13,45 @@ RSpec.describe Period, type: :model do
 
   describe '#started_at' do
     it { should validate_presence_of(:started_at) }
+
+    context 'when it is changed' do
+      before { period.started_at = period.started_at - 1.second }
+
+      it { should be_invalid }
+
+      context 'when under admin-mode' do
+        before { period.admin_mode = true }
+
+        it { should be_valid }
+      end
+    end
   end
 
   describe '#ended_at' do
     context 'when it ends before it starts' do
       let(:period) { build(:period, started_at: Time.current, ended_at: 5.hours.ago) }
+
       it { should be_invalid }
     end
 
     context 'when it is changed the first time' do
       let(:period) { create(:period, ended_at: nil) }
       before { period.ended_at = 6.hours.from_now }
+
       it { should be_valid }
     end
 
-    context 'when it is changed' do
+    context 'when it is changed a second time' do
       let(:period) { create(:period, ended_at: 1.hour.from_now) }
-      before { period.ended_at = 6.hours.from_now }
+      before { period.ended_at = period.ended_at + 1.second }
+
       it { should be_invalid }
+
+      context 'when under admin-mode' do
+        before { period.admin_mode = true }
+
+        it { should be_valid }
+      end
     end
   end
 
@@ -72,36 +93,42 @@ RSpec.describe Period, type: :model do
         context 'when it contains the existent one range' do
           let(:ended_at) { period.ended_at + 1.hour }
           let(:started_at) { period.started_at - 1.hour }
+
           it { should be_invalid }
         end
 
         context 'when it is contained by the existent one range' do
           let(:ended_at) { period.ended_at - 1.second }
           let(:started_at) { period.started_at + 1.second }
+
           it { should be_invalid }
         end
 
         context 'when it starts before but ends into the existent one range' do
           let(:started_at) { period.started_at - 1.hour }
           let(:ended_at) { period.started_at + 1.second }
+
           it { should be_invalid }
         end
 
         context 'when it ends after but starts into the existent one range' do
           let(:started_at) { period.started_at + 1.second }
           let(:ended_at) { period.ended_at + 1.hour }
+
           it { should be_invalid }
         end
 
         context 'when it ends before the existent one starts' do
           let(:ended_at) { period.started_at - 1.hour }
           let(:started_at) { ended_at - 6.hours }
+
           it { should be_valid }
         end
 
         context 'when it starts before the existent one ends' do
           let(:started_at) { period.ended_at + 1.second }
           let(:ended_at) { started_at + 6.hours }
+
           it { should be_valid }
         end
       end
