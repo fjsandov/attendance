@@ -1,10 +1,10 @@
 class PeriodsController < ApplicationController
-  before_action :set_user
-  before_action :set_period, only: %i(update destroy)
+  load_and_authorize_resource :user
+  load_and_authorize_resource :period, through: :user
 
   # GET /users/{user_id}/periods
   def index
-    render json: @user.periods.as_json(include: :period_deletion, except: :period_deletion_id)
+    render json: @periods.as_json(include: :period_deletion, except: :period_deletion_id)
   end
 
   # POST /users/{user_id}/periods
@@ -35,15 +35,5 @@ class PeriodsController < ApplicationController
     else
       render json: period_deletion.errors, status: :unprocessable_entity
     end
-  end
-
-  private
-
-  def set_user
-    @user = User.find(params[:user_id])
-  end
-
-  def set_period
-    @period = @user.periods.find(params[:id])
   end
 end
