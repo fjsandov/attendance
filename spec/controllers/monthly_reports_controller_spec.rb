@@ -44,7 +44,7 @@ RSpec.describe MonthlyReportsController, type: :controller do
 
         it 'returns with an unprocessable entity status' do
           post :create, params: params
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status :unprocessable_entity
         end
       end
     end

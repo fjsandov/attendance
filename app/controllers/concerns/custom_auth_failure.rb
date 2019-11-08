@@ -1,9 +1,8 @@
 class CustomAuthFailure < Devise::FailureApp
   def respond
-    self.status = 401
-    self.content_type = 'json'
-    self.response_body = {
-      error: 'Invalid login credentials'
-    }.to_json
+    unauthorized = Errors::Unauthorized.new
+    self.status = unauthorized.status
+    self.content_type = 'application/json'
+    self.response_body = unauthorized.to_h.to_json
   end
 end

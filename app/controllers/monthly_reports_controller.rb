@@ -5,11 +5,8 @@ class MonthlyReportsController < ApplicationController
   # POST /users/{user_id}/monthly-reports
   def create
     @monthly_report = MonthlyReport.new(monthly_report_params)
-    if @monthly_report.valid?
-      render json: @monthly_report.generate_report, status: :created
-    else
-      render json: @monthly_report.errors, status: :unprocessable_entity
-    end
+    @monthly_report.validate!
+    render json: @monthly_report.generate_report, status: :created
   end
 
   private

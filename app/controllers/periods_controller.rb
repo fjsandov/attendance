@@ -11,31 +11,22 @@ class PeriodsController < ApplicationController
   def create
     @period = @user.periods.new(create_params)
     @period.admin_mode = current_user.admin?
-    if @period.save
-      render json: @period, status: :created
-    else
-      render json: @period.errors, status: :unprocessable_entity
-    end
+    @period.save!
+    render json: @period, status: :created
   end
 
   # PATCH/PUT /users/{user_id}/periods/{id}
   def update
     @period.admin_mode = current_user.admin?
-    if @period.update(update_params)
-      render json: @period
-    else
-      render json: @period.errors, status: :unprocessable_entity
-    end
+    @period.update!(update_params)
+    render json: @period
   end
 
   # DELETE /users/{user_id}/periods/{id}
   def destroy
     period_deletion = @period.build_period_deletion(destroy_params)
-    if period_deletion.save
-      head :no_content
-    else
-      render json: period_deletion.errors, status: :unprocessable_entity
-    end
+    period_deletion.save!
+    head :no_content
   end
 
   private
