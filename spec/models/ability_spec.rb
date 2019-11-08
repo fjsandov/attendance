@@ -5,6 +5,7 @@ RSpec.describe Ability, type: :model do
   let(:user) { create(:user) }
   let(:user_resource) { build(:user) }
   let(:period_resource) { build(:period) }
+  let(:monthly_report_resource) { build(:monthly_report) }
 
   subject { Ability.new(user) }
 
@@ -20,6 +21,12 @@ RSpec.describe Ability, type: :model do
     context 'Period resource' do
       %i(index show new create update destroy).each do |role|
         it{ should be_able_to(role, period_resource) }
+      end
+    end
+
+    context 'Monthly report resource' do
+      %i(index show new create update destroy).each do |role|
+        it{ should be_able_to(role, monthly_report_resource) }
       end
     end
   end
@@ -55,6 +62,22 @@ RSpec.describe Ability, type: :model do
 
         %i(index show new create update destroy).each do |role|
           it{ should be_able_to(role, period_resource) }
+        end
+      end
+    end
+
+    context 'Monthly report resource' do
+      context 'when accessing another user monthly reports' do
+        %i(index show new create update destroy).each do |role|
+          it{ should_not be_able_to(role, monthly_report_resource) }
+        end
+      end
+
+      context 'when accessing own monthly reports' do
+        let(:monthly_report_resource) { build(:monthly_report, user: user) }
+
+        %i(index show new create update destroy).each do |role|
+          it{ should be_able_to(role, monthly_report_resource) }
         end
       end
     end

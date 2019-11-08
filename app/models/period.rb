@@ -10,9 +10,14 @@ class Period < ApplicationRecord
 
   scope :deleted, -> { where.not(period_deletion: nil) }
   scope :open, -> { where(ended_at: nil) }
+  scope :complete, -> { where(period_deletion: nil).where.not(ended_at: nil) }
 
   def as_json(options = {})
     super(options.merge({ include: :period_deletion, except: :period_deletion_id }))
+  end
+
+  def elapsed_time
+    TimeDifference.between(started_at, ended_at)
   end
 
   private

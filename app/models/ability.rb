@@ -10,9 +10,11 @@ class Ability
     if user.admin?
       can :crud, User
       can :crud, Period
+      can :crud, MonthlyReport
     else
       can %i(show update), User, id: user.id
       can :crud, Period, user_id: user.id
+      can :crud, MonthlyReport, user_id: user.id
     end
   end
 end
