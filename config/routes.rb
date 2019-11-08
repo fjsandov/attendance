@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :users, only: :index do
+  resources :users, except: :show do
     resources :periods, except: :show
   end
 
@@ -10,6 +10,6 @@ Rails.application.routes.draw do
                sign_out: :logout
              },
              controllers: {
-               sessions: :sessions,
+               sessions: :sessions
              }
 end

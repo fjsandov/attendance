@@ -105,7 +105,7 @@ RSpec.describe PeriodsController, type: :controller do
 
         it 'returns with an unprocessable entity status' do
           patch :update, params: params
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status :unprocessable_entity
         end
       end
     end
@@ -146,7 +146,7 @@ RSpec.describe PeriodsController, type: :controller do
         it { should_not be_nil }
 
         it 'returns with a no content status' do
-          expect(response).to have_http_status(:no_content)
+          expect(response).to have_http_status :no_content
         end
       end
 
@@ -154,7 +154,7 @@ RSpec.describe PeriodsController, type: :controller do
         before { delete :destroy, params: params }
 
         it 'returns with an unprocessable entity status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status :unprocessable_entity
         end
       end
     end

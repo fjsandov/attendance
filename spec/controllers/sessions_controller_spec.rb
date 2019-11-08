@@ -7,7 +7,7 @@ RSpec.describe SessionsController, type: :controller do
 
   describe 'POST #create' do
     let(:user) { create(:user) }
-    let(:valid_attributes) do
+    let(:params) do
       {
         user: {
           email: user.email,
@@ -16,18 +16,18 @@ RSpec.describe SessionsController, type: :controller do
       }
     end
 
-    let(:invalid_attributes) do
-      {
-        user: {
-          email: user.email,
-          password: 'wrong-password'
-        }
-      }
-    end
-
     context 'with invalid params' do
+      let(:params) do
+        {
+          user: {
+            email: user.email,
+            password: 'wrong-password'
+          }
+        }
+      end
+
       before do
-        post :create, params: invalid_attributes
+        post :create, params: params
       end
 
       it 'returns an "unauthorized" status' do
@@ -37,17 +37,27 @@ RSpec.describe SessionsController, type: :controller do
 
     context 'with valid params' do
       before do
-        post :create, params: valid_attributes
+        post :create, params: params
       end
 
-      it 'returns with an ok status' do
-        expect(response).to have_http_status :ok
+      context 'when the user is active' do
+        it 'returns with an ok status' do
+          expect(response).to have_http_status :ok
+        end
+
+        it 'returns a valid body' do
+          expect(JSON.parse(response.body).keys).to contain_exactly(
+            'id', 'name', 'email', 'admin', 'jwt_token', 'created_at', 'updated_at'
+          )
+        end
       end
 
-      it 'returns a valid body' do
-        expect(JSON.parse(response.body).keys).to contain_exactly(
-          'id', 'name', 'email', 'admin', 'jwt_token', 'created_at', 'updated_at'
-        )
+      context 'when the user is inactive' do
+        let(:user) { create(:inactive_user) }
+
+        it 'returns with an "unauthorized" status' do
+          expect(response).to have_http_status :unauthorized
+        end
       end
     end
   end
