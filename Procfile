@@ -1,2 +1,2 @@
 web: rails s
-release: release.sh
+release: ./release.sh
