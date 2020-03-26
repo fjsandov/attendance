@@ -1,10 +1,20 @@
-# Ruby CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-ruby/ for more details
-#
-version: 2
-jobs:
-  build:
+version: 2.1
+
+orbs:
+  swissknife: roopakv/swissknife@0.27.0
+ 
+aliases:
+  - &cache-save-key v1-dependencies-{{ checksum "Gemfile.lock" }}
+  - &cache-restore-keys
+    - v1-dependencies-{{ checksum "Gemfile.lock" }}
+    - v1-dependencies-
+only-master: &only-master
+  branches:
+      only:
+        - master
+
+executors:
+  ruby-executor:
     docker:
       - image: circleci/ruby:2.6.0
         environment:
@@ -15,41 +25,62 @@ jobs:
           POSTGRES_USER: attendance
           POSTGRES_DB: attendance_test
 
-    working_directory: ~/attendance
-
+commands:
+  setup:
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "Gemfile.lock" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
+          keys: *cache-restore-keys
       - run:
           name: install dependencies
           command: |
             bundle install --jobs=4 --retry=3 --path vendor/bundle
-
+      - swissknife/fail_if_dirty:
+          pattern: Gemfile.lock
+          message: Gemfile.lock is outdated with the Gemfile. Fix it by executing "bundle install" and commit the Gemfile.lock changes.
       - save_cache:
           paths:
             - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+          key: *cache-save-key
 
+  deploy_to_heroku:
+    parameters:
+      app_name:
+        type: string
+    steps:
+      - run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/<< parameters.app_name >>.git master
+
+jobs:
+  test:
+    executor: ruby-executor
+    working_directory: ~/attendance
+    steps:
+      - setup
       - run:
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
-
       - run:
           name: Migrate database
           command: bundle exec rake db:migrate
-
       - run:
           name: Run rspec in parallel
           command: bundle exec rspec
+
+  deploy:
+    executor: ruby-executor
+    steps:
+      - checkout
+      - deploy_to_heroku:
+          app_name: $APP_NAME
+    
 workflows:
   version: 2
   build:
     jobs:
-      - build
+      - test
+      - deploy:
+          type: approval
+          requires:
+            - test
+          filters: 
+            <<: *only-master
