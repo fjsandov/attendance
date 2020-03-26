@@ -82,5 +82,5 @@ workflows:
           type: approval
           requires:
             - test
-          filters: 
-            <<: *only-master
+          # filters: 
+          #   <<: *only-master
