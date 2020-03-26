@@ -37,7 +37,7 @@ commands:
             bundle install --jobs=4 --retry=3 --path vendor/bundle
       - swissknife/fail_if_dirty:
           pattern: Gemfile.lock
-          message: Gemfile.lock is outdated with the Gemfile. Fix it by executing "bundle install" and commit the Gemfile.lock changes.
+          custom-error-message: Gemfile.lock is outdated with the Gemfile. Fix it by executing "bundle install" and commit the Gemfile.lock changes.
       - save_cache:
           paths:
             - ./vendor/bundle
