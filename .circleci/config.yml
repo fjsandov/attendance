@@ -51,7 +51,7 @@ commands:
       app_name:
         type: string
     steps:
-      - run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/<< parameters.app_name >>.git {{ .Branch }}:master
+      - run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/<< parameters.app_name >>.git $CIRCLE_BRANCH:master
 
 jobs:
   test:
