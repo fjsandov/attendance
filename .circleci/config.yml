@@ -26,7 +26,7 @@ executors:
           POSTGRES_DB: attendance_test
   git-executor:
     docker:
-      - image: alphine/git:1.0.7
+      - image: circleci/ruby:2.6.0
 
 commands:
   setup:
@@ -48,10 +48,10 @@ commands:
 
   deploy_to_heroku:
     parameters:
-      app_name:
+      branch:
         type: string
     steps:
-      - run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/<< parameters.app_name >>.git master
+      - run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME.git << parameters.branch >>:master
 
 jobs:
   test:
@@ -79,7 +79,7 @@ jobs:
     steps:
       - checkout
       - deploy_to_heroku:
-          app_name: $APP_NAME
+          branch: {{ .Branch }}
     
 workflows:
   workflow:
