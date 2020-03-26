@@ -24,9 +24,9 @@ executors:
         environment:
           POSTGRES_USER: attendance
           POSTGRES_DB: attendance_test
-    git-executor:
-        docker:
-          - image: alphine/git:1.0.7
+  git-executor:
+    docker:
+      - image: alphine/git:1.0.7
 
 commands:
   setup:
