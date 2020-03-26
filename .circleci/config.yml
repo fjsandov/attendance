@@ -68,6 +68,11 @@ jobs:
       - run:
           name: Run rspec in parallel
           command: bundle exec rspec
+ 
+  wait-for-approval:
+    executor: git-executor
+    steps:
+      - run: echo "approved deploy!"
 
   deploy:
     executor: git-executor
@@ -80,9 +85,12 @@ workflows:
   workflow:
     jobs:
       - test
-      - deploy:
+      - wait-for-approval:
           type: approval
           requires:
             - test
+      - deploy:
+          requires:
+            - wait-for-approval
           # filters: 
           #   <<: *only-master
