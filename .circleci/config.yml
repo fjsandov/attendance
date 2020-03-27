@@ -84,13 +84,13 @@ jobs:
 workflows:
   workflow:
     jobs:
-      - test
-      - wait-for-approval:
-          # type: approval
-          requires:
-            - test
-      - deploy:
-          requires:
-            - wait-for-approval
+      # - test
+      # - wait-for-approval:
+      #     # type: approval
+      #     requires:
+      #       - test
+      - deploy
+          # requires:
+          #   - wait-for-approval
           # filters: 
           #   <<: *only-master
