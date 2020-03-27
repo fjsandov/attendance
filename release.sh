@@ -1,2 +1,3 @@
 echo "Running release.sh"
-RAILS_ENV=production rails db:migrate
+# RAILS_ENV=production rails db:migrate
+exit 1
